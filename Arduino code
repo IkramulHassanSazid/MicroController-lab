@@ -2,36 +2,46 @@
 //
 void setup()
 {
+  pinMode(1, OUTPUT);
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
 	
 }
 
 void loop()
 {
-  digitalWrite(3, HIGH);
-  delay(1000); // Wait for 2000 millisecond(s)
-  digitalWrite(3, LOW);
-  delay(20); // Wait for 1000 millisecond(s)
+  int state=1;
+  char flag;
+  switch(state){
   
-  //yellow light
- 
-  digitalWrite(2, HIGH);
-  delay(5000); // Wait for 2000 millisecond(s)
-  digitalWrite(2, LOW);
-  delay(20); // Wait for 1000 millisecond(s)
-  
-  //Green Light
-  digitalWrite(1, HIGH);
-  delay(1000); // Wait for 2000 millisecond(s)
-  digitalWrite(1, LOW);
-  delay(20); // Wait for 1000 millisecond(s)
-	
+    case 1:
+    red_on:
+  	digitalWrite(3, HIGH);
+    delay(1000); // Wait for 2000 millisecond(s)
+    digitalWrite(3, LOW);
+    delay(20); // Wait for 1000 millisecond(s)
+    flag = 'r';
+    case 2:
     //yellow light
- 
-  digitalWrite(2, HIGH);
-  delay(1000); // Wait for 2000 millisecond(s)
-  digitalWrite(2, LOW);
-  delay(20); // Wait for 1000 millisecond(s)
+ 	yellow_on:
+   digitalWrite(2, HIGH);
+   delay(1000); // Wait for 2000 millisecond(s)
+   digitalWrite(2, LOW);
+   delay(20); // Wait for 1000 millisecond(s)
+    if(flag=='r'){
+            goto green_on;
+            
+        }else{goto red_on;}
+    case 3:
+    green_on:
+    //Green Light
+    digitalWrite(1, HIGH);
+    delay(1000); // Wait for 2000 millisecond(s)
+   digitalWrite(1, LOW);
+   delay(20); // Wait for 1000 millisecond(s)
+   flag = 'g';
+     goto yellow_on;
+    
+  }
+  
 }
