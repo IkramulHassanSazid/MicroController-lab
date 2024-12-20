@@ -1,91 +1,61 @@
-const int redPin = 2;
-const int greenPin = 7;
-const int yellowPin = 4;
-const int d3_greenPin = 9;
-const int d3_redPin = 10;
+// C++ code
+//Transmitter arduino
+const int redPin = 9;
+const int greenPin = 6;
+const int buttonPin = 8;
 
-int state = 1;           // Initial state (1: Green, 2: Yellow, 3: Red)
 char receivedChar;
-char flag = 'g';         // Flag to manage transitions
-unsigned long prevTime1 = 0; // For timing transitions
+unsigned long prevTime1 =0;
 unsigned long currentTime;
-
-void setup() {
+int Led1_state = LOW; //Green LED Stete
+int Led2_state =HIGH; 	//Red LED Stete
+void setup()
+{
+    
   Serial.begin(9600);
+  
+  pinMode(buttonPin, INPUT_PULLUP);
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
-  pinMode(yellowPin, OUTPUT);
-  pinMode(d3_greenPin, OUTPUT);
-  pinMode(d3_redPin, OUTPUT);
+  digitalWrite(greenPin, Led1_state); // car green light on
+  digitalWrite(redPin, Led2_state);
+  
 }
 
-void loop() {
-  currentTime = millis(); // Get current time
-
-  // Handle serial input
-  if (Serial.available() > 0) {
-    receivedChar = Serial.read();
-    if (receivedChar == '1' && state != 3) { 
-      // Button pressed, prioritize transitioning to yellow
-      state = 2;
-      flag = 'g';
-      prevTime1 = currentTime;
-    }
-  }
-
-  switch (state) {
-    // Case 1: Green light on
-    case 1:
-      digitalWrite(greenPin, HIGH);
-      digitalWrite(yellowPin, LOW);
-      digitalWrite(redPin, LOW);
-      Serial.write('g'); // Send 'g' for green light
-    	digitalWrite(d3_redPin, HIGH);
-    	digitalWrite(d3_greenPin, LOW);
-
-      if (currentTime - prevTime1 >= 2000) { // 5-second duration for green
-        state = 2; // Transition to yellow light
-        flag = 'g';
-        prevTime1 = currentTime;
-      }
-      break;
-
-    // Case 2: Yellow light on
-    case 2:
-      digitalWrite(greenPin, LOW);
-      digitalWrite(yellowPin, HIGH);
-      digitalWrite(redPin, LOW);
-      Serial.write('y'); // Send 'y' for yellow light
-      
-    	digitalWrite(d3_redPin, HIGH);
-      	digitalWrite(d3_greenPin, LOW);
-
-      if (currentTime - prevTime1 >= 1000) { // 2-second duration for yellow
-        if (flag == 'g') {
-          state = 3; // Transition to red light
-          prevTime1 = currentTime; // Reset the timer for red light duration
-        } else if (flag == 'r') {
-          state = 1; // Transition back to green light
-          prevTime1 = currentTime;
-        }
-      }
-      break;
-
-    // Case 3: Red light on
-    case 3:
-      digitalWrite(greenPin, LOW);
-      digitalWrite(yellowPin, LOW);
-      digitalWrite(redPin, HIGH);
-      Serial.write('r'); // Send 'r' for red light
-	//code for d3 lights
-	digitalWrite(d3_redPin, LOW);
-    digitalWrite(d3_greenPin, HIGH);
-      if (currentTime - prevTime1 >= 2000) { // 5-second duration for red
-        flag = 'r'; // Set flag to red
-        state = 2; // Transition back to green
-        prevTime1 = currentTime;
-      }
-      break;
-  }
+void loop()
+{	
   
+  	
+   if (Serial.available() > 0) {
+    char receivedChar = Serial.read();
+
+    // Handle received characters from the first Arduino
+    currentTime = millis();
+     
+     if (receivedChar == 'r') { 
+       digitalWrite(greenPin, HIGH);
+    	digitalWrite(redPin, LOW);
+      if(currentTime - prevTime1 >= 2000){ 
+    	    	      	
+    	digitalWrite(greenPin, LOW);
+    	digitalWrite(redPin, HIGH);
+    	prevTime1 = currentTime;
+      //Serial.write('r'); // Acknowledge to the first Arduino that it's safe to proceed
+    }
+           	prevTime1 = currentTime;
+
+  }
+     else{
+   		digitalWrite(greenPin, LOW);
+    	digitalWrite(redPin, HIGH);
+   }
+   }
+  
+	int buttonState=digitalRead(buttonPin);
+    currentTime = millis();
+  	if (buttonState == LOW){
+  	Serial.write('1');
+     }else{
+    Serial.write('0');
+      }
 }
